@@ -21,9 +21,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
+import argparse
 from urllib import urlencode
 from urllib2 import urlopen
 from urlparse import urlparse, parse_qs
+
 
 import re
 
@@ -160,7 +162,7 @@ class YouTube(object):
                 continue
             else:
                 result.append(v)
-        if len(result) is 1:
+        if len(result) == 1:
             return result[0]
         else:
             raise Exception("Multiple videos returned")
@@ -307,3 +309,27 @@ def safe_filename(text, max_length=200):
     blacklist = re.compile('|'.join(ntfs + paranoid), re.UNICODE)
     filename = blacklist.sub('', text)
     return truncate(filename)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='youtube downloader')
+    parser.add_argument('--url', dest='url',
+                        help='URL of youtube video to download')
+    args = parser.parse_args()
+    
+    if args.url != None:
+        #Make sure the url is in unicode
+        if isinstance(args.url, unicode):
+            url = args.url
+        else:
+            url = unicode(args.url)
+            
+        #Initialize the youtube object
+        yt = YouTube()
+        yt.url = url
+        video = yt.get('mp4')
+        video.download()
+        
+        
+        
+       
